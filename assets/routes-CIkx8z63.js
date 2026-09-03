@@ -21112,6 +21112,36 @@ function x_(e) {
       ? `${Math.round(e / 1024)} KB`
       : `${(e / (1024 * 1024)).toFixed(1)} MB`;
 }
+async function compressImage(e) {
+  let t = await new Promise((t, n) => {
+      let r = new FileReader();
+      ((r.onload = () => t(r.result)),
+        (r.onerror = n),
+        r.readAsDataURL(e));
+    }),
+    n = await new Promise((e, n) => {
+      let r = new Image();
+      ((r.onload = () => e(r)),
+        (r.onerror = n),
+        (r.src = t));
+    }),
+    r = 1920,
+    i = n.naturalWidth,
+    a = n.naturalHeight;
+  if (i > r || a > r) {
+    let o = Math.min(r / i, r / a);
+    (i = Math.round(i * o)), (a = Math.round(a * o));
+  }
+  let o = document.createElement(`canvas`);
+  ((o.width = i), (o.height = a));
+  let s = o.getContext(`2d`);
+  s.drawImage(n, 0, 0, i, a);
+  for (let l = 0.9; l >= 0.3; l -= 0.1) {
+    let u = o.toDataURL(`image/jpeg`, l);
+    if (u.length <= y_ * 1.37) return u;
+  }
+  return o.toDataURL(`image/jpeg`, 0.3);
+}
 function S_({ label: e, id: t, error: n, hint: r, children: i }) {
   return (0, q.jsxs)(`div`, {
     children: [
@@ -21157,26 +21187,28 @@ function w_({ onSubmit: e }) {
     A = (e, t) => {
       (n((n) => ({ ...n, [e]: t })), i((t) => ({ ...t, [e]: void 0 })));
     };
-  function j(e) {
+  async function j(e) {
     let t = e.target.files?.[0];
     if (((e.target.value = ``), T(null), !t)) return;
     if (!t.type.startsWith(`image/`) || !b_.includes(t.type)) {
       T(`Choose a PNG, JPEG, WebP, or GIF screenshot.`);
       return;
     }
-    if (t.size > y_) {
-      T(`That file is ${x_(t.size)}. Keep screenshots under ${x_(y_)}.`);
-      return;
-    }
     O(!0);
-    let n = new FileReader();
-    ((n.onload = () => {
-      (h(typeof n.result == `string` ? n.result : null), _(t.name), O(!1));
-    }),
-      (n.onerror = () => {
-        (T(`Could not read that file. Try a different screenshot.`), O(!1));
-      }),
-      n.readAsDataURL(t));
+    try {
+      let n;
+      if (t.size > y_) {
+        n = await compressImage(t);
+      } else {
+        n = await new Promise((e, n) => {
+          let r = new FileReader();
+          ((r.onload = () => e(r.result)), (r.onerror = n), r.readAsDataURL(t));
+        });
+      }
+      h(n), _(t.name), O(!1);
+    } catch {
+      T(`Could not process that screenshot. Try a different one.`), O(!1);
+    }
   }
   function M() {
     (h(null), _(``), T(null), p.current && (p.current.value = ``));
