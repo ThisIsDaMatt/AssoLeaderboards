@@ -21732,7 +21732,7 @@ function w_({ onSubmit: e }) {
                     children: [
                       `PNG, JPEG, WebP, or GIF under `,
                       x_(y_),
-                      `. Saved in this browser.`,
+                      `. Larger images are compressed automatically.`,
                     ],
                   }),
             ],
