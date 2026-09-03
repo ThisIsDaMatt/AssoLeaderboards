@@ -21392,7 +21392,6 @@ function w_({ onSubmit: e }) {
                     label: `Year`,
                     id: `run-year`,
                     error: r.year,
-                    hint: `e.g. 00 or '00`,
                     children: (0, q.jsx)(`input`, {
                       id: `run-year`,
                       name: `year`,
