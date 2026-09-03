@@ -22903,19 +22903,17 @@ function sv({ runs: e, onGoSubmit: t, canDelete: n, onDelete: r }) {
                               type: `text`,
                               value: cdt,
                               onChange: (e) => {
-                                let s = e.target.value;
-                                setCdt(s);
-                                let m = s.trim().split(`/`);
-                                if (m.length === 3 && m[2].length === 4) {
-                                  let d = m[0].padStart(2, `0`),
-                                    mo = m[1].padStart(2, `0`),
-                                    y = m[2];
-                                  if (/^\d{2}\/\d{2}\/\d{4}$/.test(s.trim())) {
-                                    setCd(`${y}-${mo}-${d}`);
-                                    Tw(`custom`);
-                                  }
-                                } else if (s.trim() === ``) {
-                                  setCd(``), setCdt(``);
+                                let raw = e.target.value.replace(/\D/g, ``).slice(0, 8),
+                                  formatted = raw;
+                                if (raw.length > 4) formatted = raw.slice(0, 2) + `/` + raw.slice(2, 4) + `/` + raw.slice(4);
+                                else if (raw.length > 2) formatted = raw.slice(0, 2) + `/` + raw.slice(2);
+                                setCdt(formatted);
+                                if (formatted.length === 10) {
+                                  let m = formatted.split(`/`);
+                                  setCd(`${m[2]}-${m[1]}-${m[0]}`);
+                                  Tw(`custom`);
+                                } else if (formatted === ``) {
+                                  setCd(``);
                                   Tw(`all`);
                                 }
                               },
