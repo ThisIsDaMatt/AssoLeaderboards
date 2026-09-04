@@ -23705,7 +23705,9 @@ function mv() {
                         }),
                         (0, q.jsx)(`button`, {
                           type: `button`,
-                          onClick: () => au.signOut(),
+                          onClick: () => {
+                            if (window.confirm(`Are you sure you want to sign out?`)) au.signOut();
+                          },
                           disabled: au.loading,
                           "aria-label": `Sign out`,
                           title: `Sign out`,
