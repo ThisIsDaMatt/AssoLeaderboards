@@ -23314,7 +23314,7 @@ function useAuth() {
   };
 }
 function AuthModal({ open: e, onOpenChange: t, auth: n }) {
-  let [r, i] = (0, f.useState)(!0),
+  let [r, i] = (0, f.useState)(!1),
     [a, o] = (0, f.useState)(``),
     [s, c] = (0, f.useState)(``),
     [cp, setCp] = (0, f.useState)(``),
@@ -23323,7 +23323,7 @@ function AuthModal({ open: e, onOpenChange: t, auth: n }) {
     [m, h] = (0, f.useState)(``),
     [g, _] = (0, f.useState)(!1);
   function b() {
-    (i(!0), o(``), c(``), setCp(``), u(null), p(!1), h(``), _(!1));
+    (i(!1), o(``), c(``), setCp(``), u(null), p(!1), h(``), _(!1));
   }
   async function T(e) {
     if ((e.preventDefault(), u(null), !a.trim() || !s)) {
