@@ -23317,27 +23317,39 @@ function AuthModal({ open: e, onOpenChange: t, auth: n }) {
   let [r, i] = (0, f.useState)(!0),
     [a, o] = (0, f.useState)(``),
     [s, c] = (0, f.useState)(``),
+    [cp, setCp] = (0, f.useState)(``),
     [l, u] = (0, f.useState)(null),
     [d, p] = (0, f.useState)(!1),
     [m, h] = (0, f.useState)(``),
     [g, _] = (0, f.useState)(!1);
   function b() {
-    (o(``), c(``), u(null), p(!1), h(``), _(!1));
+    (o(``), c(``), setCp(``), u(null), p(!1), h(``), _(!1));
   }
   async function T(e) {
     if ((e.preventDefault(), u(null), !a.trim() || !s)) {
       u(`Enter both email and password.`);
       return;
     }
+    if (!r && s !== cp) {
+      u(`Passwords do not match.`);
+      return;
+    }
     if (!d) {
       p(!0);
       try {
         if (r) await n.signInWithEmail(a.trim(), s);
-        else await n.signUpWithEmail(a.trim(), s);
-        r || u(`Check your email for a confirmation link to finish creating your account.`);
+        else {
+          let res = await n.signUpWithEmail(a.trim(), s);
+          if (res?.error?.message?.includes(`already`) || res?.error?.code === `email_exists`)
+            u(`An account with this email already exists. Sign in instead.`);
+          else u(`Check your email for a confirmation link to finish creating your account.`);
+        }
         r && b();
       } catch (e) {
-        u(e instanceof Error ? e.message : `Could not sign in.`);
+        let msg = e instanceof Error ? e.message : `Could not sign in.`;
+        if (msg.includes(`already`) || msg.includes(`registered`))
+          u(`An account with this email already exists. Sign in instead.`);
+        else u(msg);
       } finally {
         p(!1);
       }
@@ -23530,6 +23542,26 @@ function AuthModal({ open: e, onOpenChange: t, auth: n }) {
                             }),
                           ],
                         }),
+                        !r &&
+                          (0, q.jsxs)(`div`, {
+                            children: [
+                              (0, q.jsx)(`label`, {
+                                htmlFor: `auth-password-confirm`,
+                                className: `mb-1.5 block text-sm font-medium text-ink-soft`,
+                                children: `Confirm password`,
+                              }),
+                              (0, q.jsx)(`input`, {
+                                id: `auth-password-confirm`,
+                                name: `password-confirm`,
+                                type: `password`,
+                                autoComplete: `new-password`,
+                                value: cp,
+                                onChange: (e) => setCp(e.target.value),
+                                placeholder: `\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022`,
+                                className: `h-12 w-full rounded-xl border border-edge bg-panel px-3.5 text-base text-ink placeholder:text-muted/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-racing/70`,
+                              }),
+                            ],
+                          }),
                         (0, q.jsx)(`button`, {
                           type: `submit`,
                           disabled: d,
