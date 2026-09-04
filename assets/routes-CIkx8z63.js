@@ -23591,6 +23591,9 @@ function mv() {
     ),
     A = t.filter((e) => e.category === `mod`).length,
     M = (0, f.useMemo)(() => new Set(t.map((e) => e.track)).size, [t]);
+  (0, f.useEffect)(() => {
+    if (au.needsProfile && au.user) _(!0);
+  }, [au.needsProfile, au.user]);
   function N() {
     (h(`submit`), window.scrollTo({ top: 0, behavior: `smooth` }));
   }
