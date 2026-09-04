@@ -23658,9 +23658,9 @@ function mv() {
                   ? (0, q.jsxs)(`div`, {
                       className: `flex shrink-0 items-center gap-2`,
                       children: [
-                        (0, q.jsx)(`span`, {
+                        (0, q.jsxs)(`span`, {
                           className: `hidden text-sm font-medium text-ink sm:block`,
-                          children: au.profile?.ar_username ?? `User`,
+                          children: [`Logged in as: `, au.profile?.ar_username ?? `User`],
                         }),
                         (0, q.jsx)(`button`, {
                           type: `button`,
