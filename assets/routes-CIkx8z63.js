@@ -23613,6 +23613,7 @@ function mv() {
     [m, h] = (0, f.useState)(`leaderboard`),
     [g, _] = (0, f.useState)(!1),
     [x, C] = (0, f.useState)(null),
+    [so, setSo] = (0, f.useState)(!1),
     ia = au.profile?.role === `admin`,
     w = (0, f.useMemo)(
       () =>
@@ -23705,9 +23706,7 @@ function mv() {
                         }),
                         (0, q.jsx)(`button`, {
                           type: `button`,
-                          onClick: () => {
-                            if (window.confirm(`Are you sure you want to sign out?`)) au.signOut();
-                          },
+                          onClick: () => setSo(!0),
                           disabled: au.loading,
                           "aria-label": `Sign out`,
                           title: `Sign out`,
@@ -23927,6 +23926,46 @@ function mv() {
           ],
         }),
       (0, q.jsx)(AuthModal, { open: g, onOpenChange: _, auth: au }),
+      so &&
+        (0, q.jsxs)(ev, {
+          children: [
+            (0, q.jsx)(I_, {
+              className: `fixed inset-0 min-h-dvh bg-black/70 transition-opacity duration-150 data-starting-style:opacity-0 data-ending-style:opacity-0`,
+            }),
+            (0, q.jsxs)($_, {
+              className: `fixed left-1/2 top-1/2 flex w-[calc(100vw-2.5rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-2xl border border-edge bg-panel-2 p-5 text-ink shadow-[0_24px_60px_rgba(0,0,0,0.6)] transition-[scale,opacity] duration-100 ease-out data-starting-style:scale-[0.96] data-starting-style:opacity-0 data-ending-style:scale-[0.96] data-ending-style:opacity-0`,
+              children: [
+                (0, q.jsx)(`h2`, {
+                  className: `text-lg font-semibold`,
+                  children: `Sign out`,
+                }),
+                (0, q.jsx)(`p`, {
+                  className: `text-sm text-muted`,
+                  children: `Are you sure you want to sign out?`,
+                }),
+                (0, q.jsxs)(`div`, {
+                  className: `flex justify-end gap-2`,
+                  children: [
+                    (0, q.jsx)(`button`, {
+                      type: `button`,
+                      onClick: () => setSo(!1),
+                      className: `inline-flex h-11 items-center rounded-lg border border-edge bg-panel px-4 text-sm font-medium text-ink-soft transition-colors hover:bg-white/10 hover:text-ink`,
+                      children: `Cancel`,
+                    }),
+                    (0, q.jsx)(`button`, {
+                      type: `button`,
+                      onClick: () => {
+                        (au.signOut(), setSo(!1));
+                      },
+                      className: `inline-flex h-11 items-center gap-1.5 rounded-lg bg-racing px-4 text-sm font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.25)_inset,0_6px_18px_rgba(255,45,45,0.3)] transition-colors hover:bg-racing-dim`,
+                      children: `Sign out`,
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          ],
+        }),
     ],
   });
 }
