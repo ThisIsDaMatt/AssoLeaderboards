@@ -23323,7 +23323,7 @@ function AuthModal({ open: e, onOpenChange: t, auth: n }) {
     [m, h] = (0, f.useState)(``),
     [g, _] = (0, f.useState)(!1);
   function b() {
-    (o(``), c(``), setCp(``), u(null), p(!1), h(``), _(!1));
+    (i(!0), o(``), c(``), setCp(``), u(null), p(!1), h(``), _(!1));
   }
   async function T(e) {
     if ((e.preventDefault(), u(null), !a.trim() || !s)) {
