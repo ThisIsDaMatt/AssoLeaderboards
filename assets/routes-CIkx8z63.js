@@ -11273,6 +11273,7 @@ function bo(e) {
     r = {
       id: e.id,
       driver: e.username ?? `Unknown driver`,
+      userId: e.user_id ?? null,
       lapTimeMs: typeof e.lap_time_ms == `number` ? e.lap_time_ms : 0,
       brand: e.brand ?? void 0,
       model: e.model ?? void 0,
@@ -11330,6 +11331,7 @@ var Co = class {
       .from(`leaderboard_entries`)
       .insert({
         username: e.driver,
+        user_id: e.userId ?? null,
         track: e.track,
         layout: e.layout,
         brand: e.brand ?? null,
@@ -21171,7 +21173,7 @@ var C_ = (e) =>
     `h-12 w-full rounded-xl border bg-panel px-3.5 text-base text-ink placeholder:text-muted/70 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-racing/70`,
     e ? `border-racing/70` : `border-edge hover:border-white/25`,
   );
-function w_({ onSubmit: e }) {
+function w_({ onSubmit: e, user: au, profile: ap }) {
   let [t, n] = (0, f.useState)(v_),
     [r, i] = (0, f.useState)({}),
     [a, o] = (0, f.useState)(!1),
@@ -21216,7 +21218,6 @@ function w_({ onSubmit: e }) {
   function N() {
     let e = {};
     return (
-      t.driver.trim() || (e.driver = `Enter a driver name.`),
       le(t.lapTime) || (e.lapTime = `Enter a valid lap time, like 1:04.230.`),
       t.brand || (e.brand = `Select a brand.`),
       t.model.trim() || (e.model = `Enter the car model.`),
@@ -21239,7 +21240,8 @@ function w_({ onSubmit: e }) {
     let l = le(t.lapTime),
       f = {
         id: `run-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        driver: t.driver.trim(),
+        driver: ap.ar_username,
+        userId: au.id,
         lapTimeMs: l,
         brand: t.brand,
         model: t.model.trim(),
@@ -21347,11 +21349,9 @@ function w_({ onSubmit: e }) {
                 children: (0, q.jsx)(`input`, {
                   id: `run-driver`,
                   name: `driver`,
-                  autoComplete: `nickname`,
-                  value: t.driver,
-                  onChange: (e) => A(`driver`, e.target.value),
-                  placeholder: `e.g. ApexFox`,
-                  className: C_(!!r.driver),
+                  value: ap?.ar_username ?? ``,
+                  disabled: !0,
+                  className: ec(C_(!!r.driver), `cursor-not-allowed opacity-70`),
                 }),
               }),
               (0, q.jsx)(S_, {
@@ -22631,7 +22631,7 @@ function av({
   });
 }
 var ov = pe.map((e) => e.name);
-function sv({ runs: e, onGoSubmit: t, canDelete: n, onDelete: r }) {
+function sv({ runs: e, onGoSubmit: t, canDelete: n, onDelete: r, currentUserId: cu, isAdmin: ia }) {
   let [i, a] = (0, f.useState)(``),
     [o, s] = (0, f.useState)(null),
     [c, l] = (0, f.useState)(null),
@@ -23025,7 +23025,7 @@ function sv({ runs: e, onGoSubmit: t, canDelete: n, onDelete: r }) {
                   run: e,
                   rank: t + 1,
                   isFastest: t === 0,
-                  canDelete: n,
+                  canDelete: ia || (e.userId != null && e.userId === cu),
                   onDelete: r,
                 },
                 e.id,
@@ -23270,6 +23270,300 @@ function pv({ open: e, onOpenChange: t, onLogin: n }) {
     }),
   });
 }
+function useAuth() {
+  let [e, t] = (0, f.useState)(null),
+    [n, r] = (0, f.useState)(null),
+    [i, a] = (0, f.useState)(!0),
+    [o, s] = (0, f.useState)(!1);
+  (0, f.useEffect)(() => {
+    let c = go.auth.onAuthStateChange((e, t) => {
+      (r(t?.user ?? null), a(!1), s(!t?.user));
+    });
+    return () => c.data.subscription.unsubscribe();
+  }, []),
+    (0, f.useEffect)(() => {
+      if (!e) return;
+      let t = go.from(`profiles`).select(`*`).eq(`user_id`, e.id).maybeSingle();
+      t.then(({ data: t, error: n }) => {
+        (n || !t) ? s(!0) : (s(!1), go
+          .channel(`profile-${e.id}`)
+          .on(`postgres_changes`,
+            { event: `*`, schema: `public`, table: `profiles`, filter: `user_id=eq.${e.id}` },
+            () => {
+              go.from(`profiles`).select(`*`).eq(`user_id`, e.id).maybeSingle().then(({ data: e }) => {
+                r(e?.user ?? null), t !== e && (window.dispatchEvent(new Event(`profile-updated`)));
+              });
+            })
+          .subscribe());
+      });
+    }, [e]);
+  return {
+    user: e, profile: n, loading: i, needsProfile: o,
+    signInWithGoogle: () => go.auth.signInWithOAuth({ provider: `google`, options: { redirectTo: window.location.origin } }),
+    signInWithEmail: (e, t) => go.auth.signInWithPassword({ email: e, password: t }),
+    signUpWithEmail: (e, t) => go.auth.signUp({ email: e, password: t }),
+    signOut: () => go.auth.signOut(),
+    createProfile: async (t) => {
+      if (!e) throw Error(`Not signed in.`);
+      let { error: n } = await go.from(`profiles`).insert({ user_id: e.id, ar_username: t });
+      if (n) throw Error(n.message || `Could not create profile.`);
+      s(!1);
+    },
+  };
+}
+function AuthModal({ open: e, onOpenChange: t, auth: n }) {
+  let [r, i] = (0, f.useState)(!0),
+    [a, o] = (0, f.useState)(``),
+    [s, c] = (0, f.useState)(``),
+    [l, u] = (0, f.useState)(null),
+    [d, p] = (0, f.useState)(!1),
+    [m, h] = (0, f.useState)(``),
+    [g, _] = (0, f.useState)(!1);
+  function b() {
+    (o(``), c(``), u(null), p(!1), h(``), _(!1));
+  }
+  async function T(e) {
+    if ((e.preventDefault(), u(null), !a.trim() || !s)) {
+      u(`Enter both email and password.`);
+      return;
+    }
+    if (!d) {
+      p(!0);
+      try {
+        if (r) await n.signInWithEmail(a.trim(), s);
+        else await n.signUpWithEmail(a.trim(), s);
+        r || u(`Check your email for a confirmation link to finish creating your account.`);
+        r && b();
+      } catch (e) {
+        u(e instanceof Error ? e.message : `Could not sign in.`);
+      } finally {
+        p(!1);
+      }
+    }
+  }
+  async function C(e) {
+    if ((e.preventDefault(), u(null), !m.trim())) {
+      u(`Enter your AR username.`);
+      return;
+    }
+    if (!g) {
+      _(!0);
+      try {
+        (await n.createProfile(m.trim()), b());
+      } catch (e) {
+        u(e instanceof Error ? e.message : `Could not save username.`);
+      } finally {
+        _(!1);
+      }
+    }
+  }
+  let v_ = n.needsProfile && n.user;
+  return (0, q.jsx)(fv, {
+    open: e,
+    onOpenChange: (e) => {
+      (e || b(), t(e));
+    },
+    children: (0, q.jsxs)(ev, {
+      children: [
+        (0, q.jsx)(I_, {
+          className: `fixed inset-0 min-h-dvh bg-black/70 transition-opacity duration-150 data-starting-style:opacity-0 data-ending-style:opacity-0`,
+        }),
+        (0, q.jsxs)($_, {
+          className: `fixed left-1/2 top-1/2 flex w-[calc(100vw-2.5rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-2xl border border-edge bg-panel-2 p-5 text-ink shadow-[0_24px_60px_rgba(0,0,0,0.6)] transition-[scale,opacity] duration-100 ease-out data-starting-style:scale-[0.96] data-starting-style:opacity-0 data-ending-style:scale-[0.96] data-ending-style:opacity-0`,
+          children: [
+            (0, q.jsxs)(`div`, {
+              className: `flex items-start justify-between gap-3`,
+              children: [
+                (0, q.jsxs)(`div`, {
+                  className: `flex items-center gap-2`,
+                  children: [
+                    (0, q.jsx)(O, {
+                      className: `size-5 text-racing`,
+                      "aria-hidden": `true`,
+                    }),
+                    (0, q.jsx)(tv, {
+                      className: `text-lg font-semibold`,
+                      children: v_ ? `Choose your username` : `Sign in`,
+                    }),
+                  ],
+                }),
+                (0, q.jsx)(L_, {
+                  "aria-label": `Close`,
+                  className: `flex size-9 items-center justify-center rounded-lg text-muted transition-colors hover:bg-white/10 hover:text-ink`,
+                  children: (0, q.jsx)(ee, {
+                    className: `size-4`,
+                    "aria-hidden": `true`,
+                  }),
+                }),
+              ],
+            }),
+            l &&
+              (0, q.jsxs)(`div`, {
+                className: `flex items-start gap-2 rounded-xl border border-racing/40 bg-racing/10 p-3 text-sm text-ink-soft`,
+                role: `alert`,
+                children: [
+                  (0, q.jsx)(v, {
+                    className: `mt-0.5 size-4 shrink-0 text-racing`,
+                    "aria-hidden": `true`,
+                  }),
+                  (0, q.jsx)(`span`, { children: l }),
+                ],
+              }),
+            v_
+              ? (0, q.jsxs)(`form`, {
+                  onSubmit: C,
+                  noValidate: !0,
+                  className: `flex flex-col gap-4`,
+                  children: [
+                    (0, q.jsx)(R_, {
+                      className: `text-sm text-muted`,
+                      children: `Pick the username you use in Assoluto Racing. This will be shown on the leaderboard.`,
+                    }),
+                    (0, q.jsxs)(`div`, {
+                      children: [
+                        (0, q.jsx)(`label`, {
+                          htmlFor: `ar-username`,
+                          className: `mb-1.5 block text-sm font-medium text-ink-soft`,
+                          children: `AR username`,
+                        }),
+                        (0, q.jsx)(`input`, {
+                          id: `ar-username`,
+                          name: `username`,
+                          autoComplete: `nickname`,
+                          value: m,
+                          onChange: (e) => h(e.target.value),
+                          placeholder: `e.g. ApexFox`,
+                          className: `h-12 w-full rounded-xl border border-edge bg-panel px-3.5 text-base text-ink placeholder:text-muted/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-racing/70`,
+                        }),
+                      ],
+                    }),
+                    (0, q.jsx)(`button`, {
+                      type: `submit`,
+                      disabled: g,
+                      className: `inline-flex h-11 items-center justify-center gap-1.5 rounded-lg bg-racing px-4 text-sm font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.25)_inset,0_6px_18px_rgba(255,45,45,0.3)] transition-colors hover:bg-racing-dim disabled:opacity-60`,
+                      children: g
+                        ? (0, q.jsxs)(q.Fragment, {
+                            children: [
+                              (0, q.jsx)(E, {
+                                className: `size-4 animate-spin`,
+                                "aria-hidden": `true`,
+                              }),
+                              `Saving...`,
+                            ],
+                          })
+                        : `Save username`,
+                    }),
+                  ],
+                })
+              : (0, q.jsxs)(`div`, {
+                  className: `flex flex-col gap-4`,
+                  children: [
+                    (0, q.jsx)(`button`, {
+                      type: `button`,
+                      onClick: () => n.signInWithGoogle(),
+                      className: `flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-edge bg-panel px-4 text-base font-medium text-ink transition-colors hover:border-white/25 hover:bg-white/5 active:scale-[0.98]`,
+                      children: [
+                        (0, q.jsx)(`svg`, {
+                          className: `size-5`,
+                          viewBox: `0 0 24 24`,
+                          "aria-hidden": `true`,
+                          children: [
+                            (0, q.jsx)(`path`, { fill: `#4285F4`, d: `M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z` }),
+                            (0, q.jsx)(`path`, { fill: `#34A853`, d: `M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z` }),
+                            (0, q.jsx)(`path`, { fill: `#FBBC05`, d: `M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z` }),
+                            (0, q.jsx)(`path`, { fill: `#EA4335`, d: `M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z` }),
+                          ],
+                        }),
+                        `Continue with Google`,
+                      ],
+                    }),
+                    (0, q.jsxs)(`div`, {
+                      className: `flex items-center gap-3`,
+                      children: [
+                        (0, q.jsx)(`div`, { className: `h-px flex-1 bg-edge` }),
+                        (0, q.jsx)(`span`, { className: `text-xs text-muted`, children: `or` }),
+                        (0, q.jsx)(`div`, { className: `h-px flex-1 bg-edge` }),
+                      ],
+                    }),
+                    (0, q.jsxs)(`form`, {
+                      onSubmit: T,
+                      noValidate: !0,
+                      className: `flex flex-col gap-4`,
+                      children: [
+                        (0, q.jsxs)(`div`, {
+                          children: [
+                            (0, q.jsx)(`label`, {
+                              htmlFor: `auth-email`,
+                              className: `mb-1.5 block text-sm font-medium text-ink-soft`,
+                              children: `Email`,
+                            }),
+                            (0, q.jsx)(`input`, {
+                              id: `auth-email`,
+                              name: `email`,
+                              type: `email`,
+                              autoComplete: `email`,
+                              value: a,
+                              onChange: (e) => o(e.target.value),
+                              placeholder: `you@example.com`,
+                              className: `h-12 w-full rounded-xl border border-edge bg-panel px-3.5 text-base text-ink placeholder:text-muted/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-racing/70`,
+                            }),
+                          ],
+                        }),
+                        (0, q.jsxs)(`div`, {
+                          children: [
+                            (0, q.jsx)(`label`, {
+                              htmlFor: `auth-password`,
+                              className: `mb-1.5 block text-sm font-medium text-ink-soft`,
+                              children: `Password`,
+                            }),
+                            (0, q.jsx)(`input`, {
+                              id: `auth-password`,
+                              name: `password`,
+                              type: `password`,
+                              autoComplete: r ? `current-password` : `new-password`,
+                              value: s,
+                              onChange: (e) => c(e.target.value),
+                              placeholder: `\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022`,
+                              className: `h-12 w-full rounded-xl border border-edge bg-panel px-3.5 text-base text-ink placeholder:text-muted/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-racing/70`,
+                            }),
+                          ],
+                        }),
+                        (0, q.jsx)(`button`, {
+                          type: `submit`,
+                          disabled: d,
+                          className: `inline-flex h-11 items-center justify-center gap-1.5 rounded-lg bg-racing px-4 text-sm font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.25)_inset,0_6px_18px_rgba(255,45,45,0.3)] transition-colors hover:bg-racing-dim disabled:opacity-60`,
+                          children: d
+                            ? (0, q.jsxs)(q.Fragment, {
+                                children: [
+                                  (0, q.jsx)(E, {
+                                    className: `size-4 animate-spin`,
+                                    "aria-hidden": `true`,
+                                  }),
+                                  `Signing in...`,
+                                ],
+                              })
+                            : r ? `Sign in` : `Create account`,
+                        }),
+                        (0, q.jsx)(`button`, {
+                          type: `button`,
+                          onClick: () => {
+                            (i(!r), u(null));
+                          },
+                          className: `text-sm text-muted transition-colors hover:text-ink`,
+                          children: r
+                            ? `Need an account? Sign up`
+                            : `Already have an account? Sign in`,
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+          ],
+        }),
+      ],
+    }),
+  });
+}
 function mv() {
   let [e] = (0, f.useState)(() => new Co()),
     {
@@ -23280,11 +23574,12 @@ function mv() {
       deleteRun: a,
       refresh: o,
     } = te(e),
-    { authed: s, checking: c, login: l, logout: u } = se(),
+    au = useAuth(),
     [d, p] = (0, f.useState)(!1),
     [m, h] = (0, f.useState)(`leaderboard`),
     [g, _] = (0, f.useState)(!1),
     [x, C] = (0, f.useState)(null),
+    ia = au.profile?.role === `admin`,
     w = (0, f.useMemo)(
       () =>
         t.length === 0
@@ -23320,9 +23615,6 @@ function mv() {
     }
     window.setTimeout(() => C(null), 6e3);
   }
-  async function ee() {
-    s ? await u() : _(!0);
-  }
   return (0, q.jsxs)(`main`, {
     className: `mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 pb-24 pt-8 sm:px-6 sm:pt-12`,
     children: [
@@ -23349,28 +23641,53 @@ function mv() {
                   }),
                 ],
               }),
-              (0, q.jsx)(`button`, {
-                type: `button`,
-                onClick: ee,
-                disabled: c,
-                "aria-label": s ? `Lock admin mode` : `Admin login`,
-                title: s ? `Lock admin mode` : `Admin login`,
-                className: ec(
-                  `flex size-11 shrink-0 items-center justify-center rounded-xl border transition-colors active:scale-[0.96] disabled:opacity-60`,
-                  s
-                    ? `border-racing/40 bg-racing/10 text-racing hover:bg-racing/20`
-                    : `border-edge bg-panel text-muted hover:border-white/25 hover:text-ink`,
-                ),
-                children: s
-                  ? (0, q.jsx)(D, {
-                      className: `size-4`,
-                      "aria-hidden": `true`,
-                    })
-                  : (0, q.jsx)(O, {
-                      className: `size-4`,
+              au.loading
+                ? (0, q.jsx)(`div`, {
+                    className: `flex size-11 shrink-0 items-center justify-center`,
+                    children: (0, q.jsx)(E, {
+                      className: `size-4 animate-spin text-muted`,
                       "aria-hidden": `true`,
                     }),
-              }),
+                  })
+                : au.user
+                  ? (0, q.jsxs)(`div`, {
+                      className: `flex shrink-0 items-center gap-2`,
+                      children: [
+                        (0, q.jsx)(`span`, {
+                          className: `hidden text-sm font-medium text-ink sm:block`,
+                          children: au.profile?.ar_username ?? `User`,
+                        }),
+                        (0, q.jsx)(`button`, {
+                          type: `button`,
+                          onClick: () => au.signOut(),
+                          disabled: au.loading,
+                          "aria-label": `Sign out`,
+                          title: `Sign out`,
+                          className: ec(
+                            `flex size-11 shrink-0 items-center justify-center rounded-xl border transition-colors active:scale-[0.96] disabled:opacity-60`,
+                            `border-racing/40 bg-racing/10 text-racing hover:bg-racing/20`,
+                          ),
+                          children: (0, q.jsx)(D, {
+                            className: `size-4`,
+                            "aria-hidden": `true`,
+                          }),
+                        }),
+                      ],
+                    })
+                  : (0, q.jsx)(`button`, {
+                      type: `button`,
+                      onClick: () => _(!0),
+                      "aria-label": `Sign in`,
+                      title: `Sign in`,
+                      className: `inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl border border-edge bg-panel px-4 text-sm font-medium text-ink-soft transition-colors hover:border-white/25 hover:text-ink active:scale-[0.96]`,
+                      children: [
+                        (0, q.jsx)(O, {
+                          className: `size-4`,
+                          "aria-hidden": `true`,
+                        }),
+                        `Sign in`,
+                      ],
+                    }),
             ],
           }),
           (0, q.jsxs)(`div`, {
@@ -23500,10 +23817,40 @@ function mv() {
                 : (0, q.jsx)(sv, {
                     runs: t,
                     onGoSubmit: N,
-                    canDelete: s,
                     onDelete: L,
+                    currentUserId: au.user?.id ?? null,
+                    isAdmin: ia,
                   })
-            : (0, q.jsx)(w_, { onSubmit: i }),
+            : au.user && au.profile
+              ? (0, q.jsx)(w_, {
+                  onSubmit: i,
+                  user: au.user,
+                  profile: au.profile,
+                })
+              : (0, q.jsxs)(`div`, {
+                  style: { marginTop: `2.5rem`, marginBottom: `2.5rem`, paddingTop: `4rem`, paddingBottom: `4rem` },
+                  className: `flex flex-col items-center gap-6 rounded-2xl border border-dashed border-edge bg-panel/50 px-6 text-center`,
+                  children: [
+                    (0, q.jsx)(O, {
+                      className: `size-10 text-muted`,
+                      "aria-hidden": `true`,
+                    }),
+                    (0, q.jsx)(`p`, {
+                      className: `text-lg font-medium text-ink`,
+                      children: `Please sign in to submit a lap`,
+                    }),
+                    (0, q.jsx)(`p`, {
+                      className: `max-w-sm text-sm text-muted`,
+                      children: `You need an account to log lap times. Sign in with Google or email to get started.`,
+                    }),
+                    (0, q.jsx)(`button`, {
+                      type: `button`,
+                      onClick: () => _(!0),
+                      className: `mt-2 inline-flex h-11 items-center gap-1.5 rounded-lg bg-racing px-5 text-sm font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.25)_inset,0_6px_18px_rgba(255,45,45,0.3)] transition-all hover:bg-racing-dim active:scale-[0.98]`,
+                      children: `Sign in`,
+                    }),
+                  ],
+                }),
       }),
       x &&
         (0, q.jsxs)(`div`, {
@@ -23531,7 +23878,7 @@ function mv() {
             }),
           ],
         }),
-      (0, q.jsx)(pv, { open: g, onOpenChange: _, onLogin: l }),
+      (0, q.jsx)(AuthModal, { open: g, onOpenChange: _, auth: au }),
     ],
   });
 }
