@@ -23271,43 +23271,45 @@ function pv({ open: e, onOpenChange: t, onLogin: n }) {
   });
 }
 function useAuth() {
-  let [e, t] = (0, f.useState)(null),
-    [n, r] = (0, f.useState)(null),
-    [i, a] = (0, f.useState)(!0),
-    [o, s] = (0, f.useState)(!1);
+  let [user, setUser] = (0, f.useState)(null),
+    [profile, setProfile] = (0, f.useState)(null),
+    [loading, setLoading] = (0, f.useState)(!0),
+    [needsProfile, setNeedsProfile] = (0, f.useState)(!1);
   (0, f.useEffect)(() => {
+    go.auth.getSession().then(({ data: { session: e } }) => {
+      (setUser(e?.user ?? null), setLoading(!1));
+    });
     let c = go.auth.onAuthStateChange((e, t) => {
-      (r(t?.user ?? null), a(!1), s(!t?.user));
+      (setUser(t?.user ?? null), setLoading(!1));
     });
     return () => c.data.subscription.unsubscribe();
   }, []),
     (0, f.useEffect)(() => {
-      if (!e) return;
-      let t = go.from(`profiles`).select(`*`).eq(`user_id`, e.id).maybeSingle();
-      t.then(({ data: t, error: n }) => {
-        (n || !t) ? s(!0) : (s(!1), go
-          .channel(`profile-${e.id}`)
-          .on(`postgres_changes`,
-            { event: `*`, schema: `public`, table: `profiles`, filter: `user_id=eq.${e.id}` },
-            () => {
-              go.from(`profiles`).select(`*`).eq(`user_id`, e.id).maybeSingle().then(({ data: e }) => {
-                r(e?.user ?? null), t !== e && (window.dispatchEvent(new Event(`profile-updated`)));
-              });
-            })
-          .subscribe());
+      if (!user) {
+        (setProfile(null), setNeedsProfile(!1));
+        return;
+      }
+      go.from(`profiles`).select(`*`).eq(`user_id`, user.id).maybeSingle().then(({ data: t, error: n }) => {
+        if (n || !t) {
+          setNeedsProfile(!0);
+        } else {
+          (setProfile(t), setNeedsProfile(!1));
+        }
       });
-    }, [e]);
+    }, [user]);
   return {
-    user: e, profile: n, loading: i, needsProfile: o,
+    user, profile, loading, needsProfile,
     signInWithGoogle: () => go.auth.signInWithOAuth({ provider: `google`, options: { redirectTo: window.location.origin } }),
     signInWithEmail: (e, t) => go.auth.signInWithPassword({ email: e, password: t }),
     signUpWithEmail: (e, t) => go.auth.signUp({ email: e, password: t }),
     signOut: () => go.auth.signOut(),
     createProfile: async (t) => {
-      if (!e) throw Error(`Not signed in.`);
-      let { error: n } = await go.from(`profiles`).insert({ user_id: e.id, ar_username: t });
+      if (!user) throw Error(`Not signed in.`);
+      let { error: n } = await go.from(`profiles`).insert({ user_id: user.id, ar_username: t });
       if (n) throw Error(n.message || `Could not create profile.`);
-      s(!1);
+      go.from(`profiles`).select(`*`).eq(`user_id`, user.id).maybeSingle().then(({ data: e }) => {
+        (setProfile(e), setNeedsProfile(!1));
+      });
     },
   };
 }
