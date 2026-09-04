@@ -23691,13 +23691,14 @@ function mv() {
                       className: `flex shrink-0 items-center gap-2`,
                       children: [
                         (0, q.jsxs)(`span`, {
-                          className: `hidden text-sm font-medium text-ink sm:block`,
+                          className: `hidden items-center text-sm font-medium text-ink sm:flex`,
                           children: [
                             `Logged in as: `,
                             au.profile?.ar_username ?? `User`,
                             ia &&
                               (0, q.jsx)(`span`, {
-                                className: `ml-4 inline-flex items-center rounded-md bg-racing/15 px-1.5 py-0.5 text-xs font-semibold text-racing`,
+                                style: { marginLeft: `10px` },
+                                className: `inline-flex items-center rounded-md bg-racing/15 px-1.5 py-0.5 text-xs font-semibold text-racing`,
                                 children: `Admin`,
                               }),
                           ],
