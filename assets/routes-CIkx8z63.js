@@ -23692,7 +23692,15 @@ function mv() {
                       children: [
                         (0, q.jsxs)(`span`, {
                           className: `hidden text-sm font-medium text-ink sm:block`,
-                          children: [`Logged in as: `, au.profile?.ar_username ?? `User`],
+                          children: [
+                            `Logged in as: `,
+                            au.profile?.ar_username ?? `User`,
+                            ia &&
+                              (0, q.jsx)(`span`, {
+                                className: `ml-1.5 inline-flex items-center rounded-md bg-racing/15 px-1.5 py-0.5 text-xs font-semibold text-racing`,
+                                children: `Admin`,
+                              }),
+                          ],
                         }),
                         (0, q.jsx)(`button`, {
                           type: `button`,
