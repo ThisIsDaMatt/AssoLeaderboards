@@ -23397,7 +23397,7 @@ function AuthModal({ open: e, onOpenChange: t, auth: n }) {
                     }),
                     (0, q.jsx)(tv, {
                       className: `text-lg font-semibold`,
-                      children: v_ ? `Choose your username` : `Sign in`,
+                      children: v_ ? `Choose your username` : r ? `Sign in` : `Sign up`,
                     }),
                   ],
                 }),
@@ -23576,7 +23576,7 @@ function AuthModal({ open: e, onOpenChange: t, auth: n }) {
                                   `Signing in...`,
                                 ],
                               })
-                            : r ? `Sign in` : `Create account`,
+                            : r ? `Sign in` : `Sign up`,
                         }),
                         (0, q.jsx)(`button`, {
                           type: `button`,
