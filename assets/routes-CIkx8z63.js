@@ -77,6 +77,25 @@ var o = (e) => e.replace(/([a-z0-9])([A-Z])/g, `$1-$2`).toLowerCase(),
   g = m(`chevron-down`, [[`path`, { d: `m6 9 6 6 6-6`, key: `qrunsl` }]]),
   chvL = m(`chevron-left`, [[`path`, { d: `m15 18-6-6 6-6`, key: `1n5b8o` }]]),
   chvR = m(`chevron-right`, [[`path`, { d: `m9 18 6-6-6-6`, key: `1n5b8p` }]]),
+  twI = m(`twitter`, [
+    [
+      `path`,
+      {
+        d: `M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 6.1-.5 8.3-3.4C7.7 16.6 5 14 4.7 10.9c1.4 1 3 1.1 3.9 1-2.6-1.9-3.6-5.5-2-8.4 2.9 3.3 6.6 4.7 10.3 4.6C15.8 4.9 19 3.4 22 4z`,
+        key: `tw1`,
+      },
+    ],
+  ]),
+  ytI = m(`youtube`, [
+    [
+      `path`,
+      {
+        d: `M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0 2 2 0 0 1-1.4-1.4z`,
+        key: `yt1`,
+      },
+    ],
+    [`path`, { d: `m10 15 5-3-5-3z`, key: `yt2` }],
+  ]),
   _ = m(`chevrons-up-down`, [
     [`path`, { d: `m7 15 5 5 5-5`, key: `1hf1tw` }],
     [`path`, { d: `m7 9 5-5 5 5`, key: `sgt6xg` }],
@@ -24068,10 +24087,72 @@ function mv() {
       (0, q.jsxs)(`footer`, {
         className: `mt-3 border-t border-edge pt-3 text-center text-[13px] text-ink-soft`,
         children: [
-          `Made (vibecoded) by `,
-          (0, q.jsx)(`span`, {
-            className: `font-medium text-racing`,
-            children: `ThisIsDaMatt`,
+          (0, q.jsxs)(`p`, {
+            children: [
+              `Made (vibecoded) by `,
+              (0, q.jsx)(`span`, {
+                className: `font-medium text-racing`,
+                children: `ThisIsDaMatt`,
+              }),
+            ],
+          }),
+          (0, q.jsxs)(`div`, {
+            className: `mt-2 flex items-center justify-center gap-2`,
+            children: [
+              (0, q.jsx)(
+                `a`,
+                {
+                  href: `https://x.com/ThisIsDaMatt`,
+                  target: `_blank`,
+                  rel: `noopener noreferrer`,
+                  "aria-label": `Twitter / X`,
+                  title: `Twitter / X`,
+                  className: `flex size-9 items-center justify-center rounded-lg text-ink-soft transition-colors hover:bg-white/10 hover:text-racing active:scale-[0.96]`,
+                  children: (0, q.jsx)(twI, {
+                    className: `size-4`,
+                    "aria-hidden": `true`,
+                  }),
+                },
+                `tw`,
+              ),
+              (0, q.jsx)(
+                `a`,
+                {
+                  href: `https://youtube.com/@ThisIsDaMatt`,
+                  target: `_blank`,
+                  rel: `noopener noreferrer`,
+                  "aria-label": `YouTube`,
+                  title: `YouTube`,
+                  className: `flex size-9 items-center justify-center rounded-lg text-ink-soft transition-colors hover:bg-white/10 hover:text-racing active:scale-[0.96]`,
+                  children: (0, q.jsx)(ytI, {
+                    className: `size-4`,
+                    "aria-hidden": `true`,
+                  }),
+                },
+                `yt`,
+              ),
+              (0, q.jsx)(
+                `a`,
+                {
+                  href: `https://discord.com/users/461238903123214346`,
+                  target: `_blank`,
+                  rel: `noopener noreferrer`,
+                  "aria-label": `Discord`,
+                  title: `Discord`,
+                  className: `flex size-9 items-center justify-center rounded-lg text-ink-soft transition-colors hover:bg-white/10 hover:text-racing active:scale-[0.96]`,
+                  children: (0, q.jsx)(`svg`, {
+                    className: `size-4`,
+                    viewBox: `0 0 24 24`,
+                    fill: `currentColor`,
+                    "aria-hidden": `true`,
+                    children: (0, q.jsx)(`path`, {
+                      d: `M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.058a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.947 2.418-2.157 2.418z`,
+                    }),
+                  }),
+                },
+                `dc`,
+              ),
+            ],
           }),
         ],
       }),
