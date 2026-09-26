@@ -24222,8 +24222,12 @@ function mv() {
               }),
             ],
           }),
+          (0, q.jsx)(`span`, {
+            className: `mt-2 block text-xs tracking-wide`,
+            children: `Contact and Socials`,
+          }),
           (0, q.jsxs)(`div`, {
-            className: `mt-2 flex items-center justify-center gap-2`,
+            className: `mt-1.5 flex items-center justify-center gap-2`,
             children: [
               (0, q.jsx)(
                 `a`,
