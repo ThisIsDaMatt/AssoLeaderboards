@@ -11346,7 +11346,7 @@ var Co = class {
         gears: e.mod?.gears || null,
         tune_notes: e.mod?.notes || null,
         screenshot_url: t,
-        game_version: "3.6.3.2081",
+        game_version: "3.6.6.2174",
       })
       .select()
       .single();
