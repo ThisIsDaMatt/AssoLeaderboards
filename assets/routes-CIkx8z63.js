@@ -24223,7 +24223,7 @@ function mv() {
             ],
           }),
           (0, q.jsx)(`span`, {
-            className: `mt-2 block text-xs tracking-wide`,
+            className: `mt-5 block text-xs tracking-wide`,
             children: `Contact and Socials`,
           }),
           (0, q.jsxs)(`div`, {
@@ -24287,7 +24287,7 @@ function mv() {
           (0, q.jsxs)(`button`, {
             type: `button`,
             onClick: () => setChg(!0),
-            className: `mt-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium text-ink-soft transition-colors hover:bg-white/10 hover:text-racing active:scale-[0.98]`,
+            className: `mt-5 inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium text-ink-soft transition-colors hover:bg-white/10 hover:text-racing active:scale-[0.98]`,
             children: [
               (0, q.jsx)(histI, {
                 className: `size-4`,
