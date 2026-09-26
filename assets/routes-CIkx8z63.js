@@ -11281,6 +11281,7 @@ function bo(e) {
       track: t,
       layout: e.layout === `reverse` ? `reverse` : `normal`,
       category: n ? `mod` : `unmod`,
+      gameVersion: e.game_version ?? void 0,
       createdAt: e.created_at ? new Date(e.created_at).getTime() : 0,
     };
   return (
@@ -22349,7 +22350,7 @@ function nv({ run: e, rank: t, isFastest: n, canDelete: r, onDelete: i }) {
                               : null,
                             (0, q.jsx)(`span`, {
                               className: `inline-flex items-center gap-1.5 font-mono`,
-                              children: `Version ${e.game_version ?? `3.6.3.2081`}`,
+                              children: `Version ${e.gameVersion ?? `3.6.3.2081`}`,
                             }),
                             ` \u00b7 `,
                             (0, q.jsx)(`span`, {
@@ -22382,7 +22383,7 @@ function nv({ run: e, rank: t, isFastest: n, canDelete: r, onDelete: i }) {
                             ` \u00b7 `,
                             (0, q.jsx)(`span`, {
                               className: `inline-flex items-center gap-1.5 font-mono`,
-                              children: `Version ${e.game_version ?? `3.6.3.2081`}`,
+                              children: `Version ${e.gameVersion ?? `3.6.3.2081`}`,
                             }),
                             ` \u00b7 `,
                             (0, q.jsx)(`span`, {
