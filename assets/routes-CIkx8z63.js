@@ -24056,14 +24056,24 @@ function mv() {
                       className: `max-w-sm text-sm text-muted`,
                       children: `You need an account to log lap times. Sign in with Google or email to get started.`,
                     }),
-                    (0, q.jsx)(`button`, {
-                      type: `button`,
-                      onClick: () => _(!0),
-                      className: `mt-2 inline-flex h-11 items-center gap-1.5 rounded-lg bg-racing px-5 text-sm font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.25)_inset,0_6px_18px_rgba(255,45,45,0.3)] transition-all hover:bg-racing-dim active:scale-[0.98]`,
-                      children: `Sign in`,
-                    }),
-                  ],
-                }),
+                     (0, q.jsx)(`button`, {
+                       type: `button`,
+                       onClick: () => _(!0),
+                       className: `mt-2 inline-flex h-11 items-center gap-1.5 rounded-lg bg-racing px-5 text-sm font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.25)_inset,0_6px_18px_rgba(255,45,45,0.3)] transition-all hover:bg-racing-dim active:scale-[0.98]`,
+                       children: `Sign in`,
+                     }),
+                   ],
+                 }),
+      }),
+      (0, q.jsxs)(`footer`, {
+        className: `mt-3 border-t border-edge pt-3 text-center text-[13px] text-ink-soft`,
+        children: [
+          `Made (vibecoded) by `,
+          (0, q.jsx)(`span`, {
+            className: `font-medium text-racing`,
+            children: `ThisIsDaMatt`,
+          }),
+        ],
       }),
       x &&
         (0, q.jsxs)(`div`, {
