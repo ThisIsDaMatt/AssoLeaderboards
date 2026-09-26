@@ -96,6 +96,17 @@ var o = (e) => e.replace(/([a-z0-9])([A-Z])/g, `$1-$2`).toLowerCase(),
     ],
     [`path`, { d: `m10 15 5-3-5-3z`, key: `yt2` }],
   ]),
+  histI = m(`history`, [
+    [
+      `path`,
+      {
+        d: `M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8`,
+        key: `h1`,
+      },
+    ],
+    [`path`, { d: `M3 3v5h5`, key: `h2` }],
+    [`path`, { d: `M12 7v5l4 2`, key: `h3` }],
+  ]),
   _ = m(`chevrons-up-down`, [
     [`path`, { d: `m7 15 5 5 5-5`, key: `1hf1tw` }],
     [`path`, { d: `m7 9 5-5 5 5`, key: `sgt6xg` }],
@@ -23783,6 +23794,120 @@ function AuthModal({ open: e, onOpenChange: t, auth: n }) {
     }),
   });
 }
+var chlog = [
+    {
+      ver: `V0.3`,
+      date: `26 September 2026`,
+      items: [
+        `New footer with socials and this changelog`,
+        `Leaderboard pagination - browse 25, 50 or 100 runs per page`,
+        `Runs now record game version 3.6.6.2174`,
+      ],
+    },
+    {
+      ver: `V0.2`,
+      date: `4 September 2026`,
+      items: [
+        `User accounts - sign in with Google or email and password`,
+        `Laps are now saved under your AR username`,
+        `You can now delete your own runs`,
+        `Signing in is now required to submit a lap`,
+      ],
+    },
+    {
+      ver: `V0.1`,
+      date: `3 September 2026`,
+      items: [
+        `Screenshots over 1.4 MB are compressed automatically in your browser`,
+        `Custom date filter (DD/MM/YYYY) in the Time period section`,
+      ],
+    },
+  ];
+function ChangelogModal({ open: e, onOpenChange: t }) {
+  return (0, q.jsx)(fv, {
+    open: e,
+    onOpenChange: t,
+    children: (0, q.jsxs)(ev, {
+      children: [
+        (0, q.jsx)(I_, {
+          className: `fixed inset-0 min-h-dvh bg-black/70 transition-opacity duration-150 data-starting-style:opacity-0 data-ending-style:opacity-0`,
+        }),
+        (0, q.jsxs)($_, {
+          className: `fixed left-1/2 top-1/2 flex w-[calc(100vw-2.5rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-2xl border border-edge bg-panel-2 p-5 text-ink shadow-[0_24px_60px_rgba(0,0,0,0.6)] transition-[scale,opacity] duration-100 ease-out data-starting-style:scale-[0.96] data-starting-style:opacity-0 data-ending-style:scale-[0.96] data-ending-style:opacity-0`,
+          children: [
+            (0, q.jsxs)(`div`, {
+              className: `flex items-start justify-between gap-3`,
+              children: [
+                (0, q.jsxs)(`div`, {
+                  className: `flex items-center gap-2`,
+                  children: [
+                    (0, q.jsx)(histI, {
+                      className: `size-5 text-racing`,
+                      "aria-hidden": `true`,
+                    }),
+                    (0, q.jsx)(tv, {
+                      className: `text-lg font-semibold`,
+                      children: `Changelogs`,
+                    }),
+                  ],
+                }),
+                (0, q.jsx)(L_, {
+                  "aria-label": `Close`,
+                  className: `flex size-9 items-center justify-center rounded-lg text-muted transition-colors hover:bg-white/10 hover:text-ink`,
+                  children: (0, q.jsx)(ee, {
+                    className: `size-4`,
+                    "aria-hidden": `true`,
+                  }),
+                }),
+              ],
+            }),
+            (0, q.jsx)(`div`, {
+              style: { maxHeight: `65vh`, overflowY: `auto` },
+              className: `flex flex-col gap-3 pr-2`,
+              children: chlog.map((c, ix) =>
+                (0, q.jsxs)(
+                  `div`,
+                  {
+                    className: ec(
+                      `flex flex-col gap-2`,
+                      ix > 0 && `mt-3 border-t border-edge pt-3`,
+                    ),
+                    children: [
+                      (0, q.jsx)(`span`, {
+                        className: `text-xs font-medium uppercase tracking-wide text-racing`,
+                        children: `${c.date} - ${c.ver}`,
+                      }),
+                      (0, q.jsx)(`ul`, {
+                        className: `flex flex-col gap-1.5`,
+                        children: c.items.map((it, ix2) =>
+                          (0, q.jsxs)(
+                            `li`,
+                            {
+                              className: `flex items-start gap-2 text-sm text-ink-soft`,
+                              children: [
+                                (0, q.jsx)(`span`, {
+                                  className: `shrink-0 text-racing`,
+                                  children: `\u00b7`,
+                                }),
+                                it,
+                              ],
+                            },
+                            ix2,
+                          ),
+                        ),
+                      }),
+                    ],
+                  },
+                  ix,
+                ),
+              ),
+            }),
+          ],
+        }),
+      ],
+    }),
+  });
+}
 function mv() {
   let [e] = (0, f.useState)(() => new Co()),
     {
@@ -23799,6 +23924,7 @@ function mv() {
     [g, _] = (0, f.useState)(!1),
     [x, C] = (0, f.useState)(null),
     [so, setSo] = (0, f.useState)(!1),
+    [chg, setChg] = (0, f.useState)(!1),
     ia = au.profile?.role === `admin`,
     w = (0, f.useMemo)(
       () =>
@@ -24154,6 +24280,18 @@ function mv() {
               ),
             ],
           }),
+          (0, q.jsxs)(`button`, {
+            type: `button`,
+            onClick: () => setChg(!0),
+            className: `mt-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium text-ink-soft transition-colors hover:bg-white/10 hover:text-racing active:scale-[0.98]`,
+            children: [
+              (0, q.jsx)(histI, {
+                className: `size-4`,
+                "aria-hidden": `true`,
+              }),
+              `Changelogs`,
+            ],
+          }),
         ],
       }),
       x &&
@@ -24183,6 +24321,7 @@ function mv() {
           ],
         }),
       (0, q.jsx)(AuthModal, { open: g, onOpenChange: _, auth: au }),
+      (0, q.jsx)(ChangelogModal, { open: chg, onOpenChange: setChg }),
       so &&
         (0, q.jsx)(fv, {
           open: so,
