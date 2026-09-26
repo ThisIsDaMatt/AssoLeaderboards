@@ -23307,9 +23307,8 @@ function useAuth() {
       if (!user) throw Error(`Not signed in.`);
       let { error: n } = await go.from(`profiles`).insert({ user_id: user.id, ar_username: t });
       if (n) throw Error(n.message || `Could not create profile.`);
-      go.from(`profiles`).select(`*`).eq(`user_id`, user.id).maybeSingle().then(({ data: e }) => {
-        (setProfile(e), setNeedsProfile(!1));
-      });
+      let { data: p2 } = await go.from(`profiles`).select(`*`).eq(`user_id`, user.id).maybeSingle();
+      (setProfile(p2), setNeedsProfile(!1));
     },
   };
 }
@@ -23323,7 +23322,7 @@ function AuthModal({ open: e, onOpenChange: t, auth: n }) {
     [m, h] = (0, f.useState)(``),
     [g, _] = (0, f.useState)(!1);
   function b() {
-    (i(!1), o(``), c(``), setCp(``), u(null), p(!1), h(``), _(!1));
+    (i(!1), o(``), c(``), setCp(``), u(null), p(!1), h(``), _(!1), setDn(!1), setDnMsg(``));
   }
   async function T(e) {
     if ((e.preventDefault(), u(null), !a.trim() || !s)) {
@@ -23337,14 +23336,17 @@ function AuthModal({ open: e, onOpenChange: t, auth: n }) {
     if (!d) {
       p(!0);
       try {
-        if (r) await n.signInWithEmail(a.trim(), s);
-        else {
+        if (r) {
+          await n.signInWithEmail(a.trim(), s);
+          setDnMsg(`Signed in successfully. Welcome back!`);
+          setDn(!0);
+        } else {
           let res = await n.signUpWithEmail(a.trim(), s);
           if (res?.error?.message?.includes(`already`) || res?.error?.code === `email_exists`)
             u(`An account with this email already exists. Sign in instead.`);
-          else u(`Check your email for a confirmation link to finish creating your account.`);
+          else if (!res?.data?.session)
+            u(`Check your email to confirm your account, then come back and sign in.`);
         }
-        r && b();
       } catch (e) {
         let msg = e instanceof Error ? e.message : `Could not sign in.`;
         if (msg.includes(`already`) || msg.includes(`registered`))
@@ -23363,7 +23365,9 @@ function AuthModal({ open: e, onOpenChange: t, auth: n }) {
     if (!g) {
       _(!0);
       try {
-        (await n.createProfile(m.trim()), b());
+        await n.createProfile(m.trim());
+        setDnMsg(`Signed up as ${m.trim()}. Your lap times will be saved under this name.`);
+        setDn(!0);
       } catch (e) {
         u(e instanceof Error ? e.message : `Could not save username.`);
       } finally {
@@ -23371,7 +23375,9 @@ function AuthModal({ open: e, onOpenChange: t, auth: n }) {
       }
     }
   }
-  let v_ = n.needsProfile && n.user;
+  let v_ = n.needsProfile && n.user,
+    [dn, setDn] = (0, f.useState)(!1),
+    [dnMsg, setDnMsg] = (0, f.useState)(``);
   return (0, q.jsx)(fv, {
     open: e,
     onOpenChange: (e) => {
@@ -23391,13 +23397,19 @@ function AuthModal({ open: e, onOpenChange: t, auth: n }) {
                 (0, q.jsxs)(`div`, {
                   className: `flex items-center gap-2`,
                   children: [
-                    (0, q.jsx)(O, {
+                    (0, q.jsx)(v_ ? O : dn ? y : O, {
                       className: `size-5 text-racing`,
                       "aria-hidden": `true`,
                     }),
                     (0, q.jsx)(tv, {
                       className: `text-lg font-semibold`,
-                      children: v_ ? `Choose your username` : r ? `Sign in` : `Sign up`,
+                      children: v_
+                        ? `Choose your username`
+                        : dn
+                          ? `You're all set`
+                          : r
+                            ? `Sign in`
+                            : `Sign up`,
                     }),
                   ],
                 }),
@@ -23466,6 +23478,28 @@ function AuthModal({ open: e, onOpenChange: t, auth: n }) {
                             ],
                           })
                         : `Save username`,
+                    }),
+                  ],
+                })
+              : dn
+              ? (0, q.jsxs)(`div`, {
+                  className: `flex flex-col gap-4`,
+                  children: [
+                    (0, q.jsx)(R_, {
+                      className: `text-sm text-muted`,
+                      children: dnMsg,
+                    }),
+                    (0, q.jsx)(`p`, {
+                      className: `text-sm text-muted`,
+                      children: `You can now submit lap times, and delete your own runs from the leaderboard.`,
+                    }),
+                    (0, q.jsx)(`button`, {
+                      type: `button`,
+                      onClick: () => {
+                        (b(), t(!1));
+                      },
+                      className: `inline-flex h-11 items-center justify-center gap-1.5 self-start rounded-lg bg-racing px-4 text-sm font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.25)_inset,0_6px_18px_rgba(255,45,45,0.3)] transition-colors hover:bg-racing-dim`,
+                      children: `Done`,
                     }),
                   ],
                 })
