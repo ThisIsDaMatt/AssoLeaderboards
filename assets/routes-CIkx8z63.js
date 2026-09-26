@@ -22646,6 +22646,7 @@ function sv({ runs: e, onGoSubmit: t, canDelete: n, onDelete: r, currentUserId: 
     [cd, setCd] = (0, f.useState)(``),
     [cdt, setCdt] = (0, f.useState)(``),
     [pg, setPg] = (0, f.useState)(1),
+    [pp, setPP] = (0, f.useState)(25),
     y = o ? ge(o) : !1,
     b = (0, f.useMemo)(() => {
       let t = i.trim().toLowerCase(),
@@ -22712,9 +22713,9 @@ function sv({ runs: e, onGoSubmit: t, canDelete: n, onDelete: r, currentUserId: 
   (0, f.useEffect)(() => {
     setPg(1);
   }, [i, o, c, u, p, h, _, w, cd]);
-  let tot = Math.max(1, Math.ceil(b.length / 25)),
+  let tot = Math.max(1, Math.ceil(b.length / pp)),
     cur = Math.min(pg, tot),
-    pgRuns = b.slice((cur - 1) * 25, cur * 25);
+    pgRuns = b.slice((cur - 1) * pp, cur * pp);
   function pgLs() {
     if (tot <= 7) return Array.from({ length: tot }, (e, t) => t + 1);
     let n = new Set(
@@ -23050,7 +23051,7 @@ function sv({ runs: e, onGoSubmit: t, canDelete: n, onDelete: r, currentUserId: 
                 nv,
                 {
                   run: e,
-                  rank: (cur - 1) * 25 + t + 1,
+                  rank: (cur - 1) * pp + t + 1,
                   isFastest: cur === 1 && t === 0,
                   canDelete: ia || (e.userId != null && e.userId === cu),
                   onDelete: r,
@@ -23059,8 +23060,12 @@ function sv({ runs: e, onGoSubmit: t, canDelete: n, onDelete: r, currentUserId: 
               ),
             ),
           }),
-      tot > 1 &&
-        (0, q.jsxs)(`nav`, {
+      b.length > 25 &&
+        (0, q.jsxs)(`div`, {
+          className: `flex flex-wrap items-center justify-between gap-2`,
+          children: [
+            tot > 1
+              ? (0, q.jsxs)(`nav`, {
           className: `flex flex-wrap items-center justify-center gap-1.5`,
           "aria-label": `Leaderboard pages`,
           children: [
@@ -23121,6 +23126,42 @@ function sv({ runs: e, onGoSubmit: t, canDelete: n, onDelete: r, currentUserId: 
               },
               `next`,
             ),
+          ],
+        })
+              : (0, q.jsx)(`span`),
+            (0, q.jsxs)(`div`, {
+          className: `flex flex-wrap items-center gap-1.5`,
+          children: [
+            (0, q.jsx)(`span`, {
+              className: `text-[13px] text-muted`,
+              children: `Runs per page`,
+            }),
+            ...[25, 50, 100].map((n2) =>
+              (0, q.jsx)(
+                `button`,
+                {
+                  type: `button`,
+                  onClick: () => {
+                    (setPP(n2),
+                      setPg(1),
+                      document
+                        .getElementById(`tabpanel-main`)
+                        ?.scrollIntoView({ behavior: `smooth` }));
+                  },
+                  "aria-pressed": n2 === pp,
+                  className: ec(
+                    `flex h-9 items-center justify-center rounded-lg px-3 text-[13px] font-medium transition-colors active:scale-[0.98]`,
+                    n2 === pp
+                      ? `bg-racing text-white shadow-[0_1px_0_rgba(255,255,255,0.2)_inset,0_4px_12px_rgba(255,45,45,0.3)]`
+                      : `bg-panel-2 text-ink-soft hover:bg-white/10 hover:text-ink`,
+                  ),
+                  children: n2,
+                },
+                `pp${n2}`,
+              ),
+            ),
+              ],
+            }),
           ],
         }),
     ],
