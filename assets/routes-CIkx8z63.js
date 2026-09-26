@@ -24214,6 +24214,7 @@ function mv() {
         className: `mt-3 border-t border-edge pt-3 text-center text-[13px] text-ink-soft`,
         children: [
           (0, q.jsxs)(`p`, {
+            className: `mt-3`,
             children: [
               `Made (vibecoded) by `,
               (0, q.jsx)(`span`, {
