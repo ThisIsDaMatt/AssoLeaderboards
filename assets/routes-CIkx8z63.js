@@ -75,6 +75,8 @@ var o = (e) => e.replace(/([a-z0-9])([A-Z])/g, `$1-$2`).toLowerCase(),
   },
   h = m(`check`, [[`path`, { d: `M20 6 9 17l-5-5`, key: `1gmf2c` }]]),
   g = m(`chevron-down`, [[`path`, { d: `m6 9 6 6 6-6`, key: `qrunsl` }]]),
+  chvL = m(`chevron-left`, [[`path`, { d: `m15 18-6-6 6-6`, key: `1n5b8o` }]]),
+  chvR = m(`chevron-right`, [[`path`, { d: `m9 18 6-6-6-6`, key: `1n5b8p` }]]),
   _ = m(`chevrons-up-down`, [
     [`path`, { d: `m7 15 5 5 5-5`, key: `1hf1tw` }],
     [`path`, { d: `m7 9 5-5 5 5`, key: `sgt6xg` }],
@@ -22643,6 +22645,7 @@ function sv({ runs: e, onGoSubmit: t, canDelete: n, onDelete: r, currentUserId: 
     [w, Tw] = (0, f.useState)(`all`),
     [cd, setCd] = (0, f.useState)(``),
     [cdt, setCdt] = (0, f.useState)(``),
+    [pg, setPg] = (0, f.useState)(1),
     y = o ? ge(o) : !1,
     b = (0, f.useMemo)(() => {
       let t = i.trim().toLowerCase(),
@@ -22706,6 +22709,29 @@ function sv({ runs: e, onGoSubmit: t, canDelete: n, onDelete: r, currentUserId: 
       _ !== `all` ||
       w !== `all` ||
       cd !== ``;
+  (0, f.useEffect)(() => {
+    setPg(1);
+  }, [i, o, c, u, p, h, _, w, cd]);
+  let tot = Math.max(1, Math.ceil(b.length / 25)),
+    cur = Math.min(pg, tot),
+    pgRuns = b.slice((cur - 1) * 25, cur * 25);
+  function pgLs() {
+    if (tot <= 7) return Array.from({ length: tot }, (e, t) => t + 1);
+    let n = new Set(
+        [1, tot, cur - 1, cur, cur + 1].filter((e) => e >= 1 && e <= tot),
+      ),
+      r = [...n].sort((e, t) => e - t),
+      i = [],
+      a = 0;
+    for (let o of r) (o - a > 1 && i.push(null), i.push(o), (a = o));
+    return i;
+  }
+  function pgGo(n) {
+    (setPg(n),
+      document
+        .getElementById(`tabpanel-main`)
+        ?.scrollIntoView({ behavior: `smooth` }));
+  }
   function S() {
     (a(``),
       s(null),
@@ -23019,20 +23045,84 @@ function sv({ runs: e, onGoSubmit: t, canDelete: n, onDelete: r, currentUserId: 
           })
         : (0, q.jsx)(`ol`, {
             className: `divide-y divide-edge overflow-hidden rounded-2xl border border-edge bg-panel`,
-            children: b.map((e, t) =>
+            children: pgRuns.map((e, t) =>
               (0, q.jsx)(
                 nv,
                 {
                   run: e,
-                  rank: t + 1,
-                  isFastest: t === 0,
+                  rank: (cur - 1) * 25 + t + 1,
+                  isFastest: cur === 1 && t === 0,
                   canDelete: ia || (e.userId != null && e.userId === cu),
                   onDelete: r,
                 },
-                e.id,
+                  e.id,
               ),
             ),
           }),
+      tot > 1 &&
+        (0, q.jsxs)(`nav`, {
+          className: `flex flex-wrap items-center justify-center gap-1.5`,
+          "aria-label": `Leaderboard pages`,
+          children: [
+            (0, q.jsx)(
+              `button`,
+              {
+                type: `button`,
+                onClick: () => pgGo(Math.max(1, cur - 1)),
+                disabled: cur === 1,
+                "aria-label": `Previous page`,
+                className: `flex size-9 items-center justify-center rounded-lg bg-panel-2 text-ink-soft transition-colors hover:bg-white/10 hover:text-ink active:scale-[0.98] disabled:opacity-60`,
+                children: (0, q.jsx)(chvL, {
+                  className: `size-4`,
+                  "aria-hidden": `true`,
+                }),
+              },
+              `prev`,
+            ),
+            ...pgLs().map((n2, ix) =>
+              n2 === null
+                ? (0, q.jsx)(
+                    `span`,
+                    {
+                      className: `text-[13px] text-muted`,
+                      children: `\u2026`,
+                    },
+                    `e${ix}`,
+                  )
+                : (0, q.jsx)(
+                    `button`,
+                    {
+                      type: `button`,
+                      onClick: () => pgGo(n2),
+                      "aria-current": n2 === cur ? `page` : void 0,
+                      className: ec(
+                        `flex h-9 items-center justify-center rounded-lg px-3 text-[13px] font-medium transition-colors active:scale-[0.98]`,
+                        n2 === cur
+                          ? `bg-racing text-white shadow-[0_1px_0_rgba(255,255,255,0.2)_inset,0_4px_12px_rgba(255,45,45,0.3)]`
+                          : `bg-panel-2 text-ink-soft hover:bg-white/10 hover:text-ink`,
+                      ),
+                      children: n2,
+                    },
+                    `p${n2}`,
+                  ),
+            ),
+            (0, q.jsx)(
+              `button`,
+              {
+                type: `button`,
+                onClick: () => pgGo(Math.min(tot, cur + 1)),
+                disabled: cur === tot,
+                "aria-label": `Next page`,
+                className: `flex size-9 items-center justify-center rounded-lg bg-panel-2 text-ink-soft transition-colors hover:bg-white/10 hover:text-ink active:scale-[0.98] disabled:opacity-60`,
+                children: (0, q.jsx)(chvR, {
+                  className: `size-4`,
+                  "aria-hidden": `true`,
+                }),
+              },
+              `next`,
+            ),
+          ],
+        }),
     ],
   });
 }
