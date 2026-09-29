@@ -23158,7 +23158,7 @@ function sv({ runs: e, onGoSubmit: t, canDelete: n, onDelete: r, currentUserId: 
             ),
           ],
         })
-              : (0, q.jsx)(`span`),
+              : (0, q.jsx)(`span`, {}),
             (0, q.jsxs)(`div`, {
           className: `flex flex-wrap items-center gap-1.5`,
           children: [
